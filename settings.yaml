@@ -1,0 +1,6 @@
+logger:
+  level: info
+  prefix: '[OPQBot-Roy]'
+  director: log
+  show-line: true
+  log-in-console: true
