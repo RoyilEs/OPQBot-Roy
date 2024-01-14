@@ -1,4 +1,4 @@
-package Ok3Http
+package utils
 
 import (
 	"bytes"

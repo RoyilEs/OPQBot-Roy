@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/charmbracelet/log"
 	"github.com/opq-osc/OPQBot/v2"
-	"github.com/opq-osc/OPQBot/v2/apiBuilder"
 	"github.com/opq-osc/OPQBot/v2/events"
 	core2 "obqbot/core"
 	"obqbot/global"
 	"obqbot/listener"
+	"obqbot/listener/friend"
+	"obqbot/listener/group"
 )
 
 func main() {
@@ -22,31 +22,14 @@ func main() {
 		panic(err)
 	}
 
-	core.On(events.EventNameGroupMsg, func(ctx context.Context, event events.IEvent) {
-		groupMsg := event.ParseGroupMsg()
-		if groupMsg.ParseTextMsg().GetTextContent() == "hello" {
-			err := apiBuilder.New(global.OBQBotUrl, global.BotQQ).
-				SendMsg().GroupMsg().TextMsg("hellod=====(￣▽￣*)b").ToUin(groupMsg.GetGroupUin()).Do(ctx)
-			if err != nil {
-				log.Error(err)
-				return
-			}
-		}
-	})
+	core.On(events.EventNameGroupMsg, listener.ListenGroup)
 
-	core.On(events.EventNameGroupMsg, listener.Yian)
+	core.On(events.EventNameGroupMsg, group.Hello)
+	core.On(events.EventNameGroupMsg, group.Yian)
+	core.On(events.EventNameGroupMsg, group.GoodNight)
 
-	core.On(events.EventNameFriendMsg, func(ctx context.Context, event events.IEvent) {
-		groupMsg := event.ParseFriendMsg()
-		if groupMsg.ParseTextMsg().GetTextContent() == "hello" {
-			err := apiBuilder.New(global.OBQBotUrl, global.BotQQ).
-				SendMsg().FriendMsg().TextMsg("hellod=====(￣▽￣*)b").ToUin(groupMsg.GetFriendUin()).Do(ctx)
-			if err != nil {
-				log.Error(err)
-				return
-			}
-		}
-	})
+	core.On(events.EventNameFriendMsg, friend.Hello)
+	core.On(events.EventNameFriendMsg, listener.ListenFriend)
 
 	err = core.ListenAndWait(context.Background())
 	if err != nil {
