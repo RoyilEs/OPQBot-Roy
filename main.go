@@ -31,6 +31,8 @@ func main() {
 		panic(err)
 	}
 
+	go HandleGroupMsg(core)
+
 	core.On(events.EventNameGroupMsg, listener.ListenGroup)
 
 	core.On(events.EventNameGroupMsg, group.Hello)
