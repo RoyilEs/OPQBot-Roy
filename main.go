@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/gorilla/websocket"
 	"github.com/opq-osc/OPQBot/v2"
 	"github.com/opq-osc/OPQBot/v2/events"
 	core2 "obqbot/core"
@@ -9,7 +10,15 @@ import (
 	"obqbot/listener"
 	"obqbot/listener/friend"
 	"obqbot/listener/group"
+	"time"
 )
+
+type WSClient struct {
+	conn         *websocket.Conn
+	reconnect    bool
+	reconnectCh  chan struct{}
+	reconnectDur time.Duration
+}
 
 func main() {
 	// 读取配置文件
@@ -27,6 +36,7 @@ func main() {
 	core.On(events.EventNameGroupMsg, group.Hello)
 	core.On(events.EventNameGroupMsg, group.Yian)
 	core.On(events.EventNameGroupMsg, group.GoodNight)
+	core.On(events.EventNameGroupMsg, group.Img)
 
 	core.On(events.EventNameFriendMsg, friend.Hello)
 	core.On(events.EventNameFriendMsg, listener.ListenFriend)
@@ -35,5 +45,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
+	// 让程序保持运行，以便能够处理WebSocket连接
+	select {}
 }

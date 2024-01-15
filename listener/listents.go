@@ -10,15 +10,20 @@ import (
 
 func ListenGroup(_ context.Context, event events.IEvent) {
 	groupMsg := event.ParseGroupMsg() // 群消息
-	groupMsgNickUin := "成员:" + groupMsg.GetSenderNick() + "(" + strconv.FormatInt(groupMsg.GetSenderUin(), 10) + ")"
-	global.Log.Info(groupMsgNickUin)
-	uin := groupMsg.GetGroupUin()
-	textGroupContent := groupMsg.ParseTextMsg().GetTextContent()
-	if textGroupContent == "" {
-		textGroupContent = "[图片]"
+	s := "群:" + groupMsg.GetGroupInfo().GroupName
+	if groupMsg.GetGroupUin() != 775064373 {
+		groupMsgNickUin := "成员:" + groupMsg.GetSenderNick() + "(" + strconv.FormatInt(groupMsg.GetSenderUin(), 10) + ")"
+		if !groupMsg.IsFromBot() {
+			global.Log.Info(s + "[" + strconv.FormatInt(groupMsg.GetGroupUin(), 10) + "]")
+			global.Log.Info(groupMsgNickUin)
+			uin := groupMsg.GetGroupUin()
+			textGroupContent := groupMsg.ParseTextMsg().GetTextContent()
+			if textGroupContent == "" {
+				textGroupContent = "[图片]"
+			}
+			log.Info("群信息:" + textGroupContent + "(" + strconv.FormatInt(uin, 10) + ")")
+		}
 	}
-	log.Info("群信息:" + textGroupContent + "(" + strconv.FormatInt(uin, 10) + ")")
-
 }
 
 func ListenFriend(_ context.Context, event events.IEvent) {
