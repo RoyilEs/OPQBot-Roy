@@ -44,7 +44,6 @@ func GoodNight(ctx context.Context, event events.IEvent) {
 		}
 		err = apiBuilderNew.SendMsg().
 			GroupMsg().TextMsg(data.Res.Content).ToUin(groupMsg.GetGroupUin()).
-			At(groupMsg.GetSenderUin()).
 			Do(ctx)
 		if err != nil {
 			global.Log.Error(err)
