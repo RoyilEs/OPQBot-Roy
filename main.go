@@ -26,14 +26,16 @@ func main() {
 
 	core.On(events.EventNameGroupMsg, listener.ListenGroup)
 
+	core.On(events.EventNameFriendMsg, listener.ListenFriend)
+
 	core.On(events.EventNameGroupMsg, group.Hello)
 	core.On(events.EventNameGroupMsg, group.Yian)
 	core.On(events.EventNameGroupMsg, group.GoodNight)
 	core.On(events.EventNameGroupMsg, group.Img)
 	core.On(events.EventNameGroupMsg, group.Draw)
+	core.On(events.EventNameGroupMsg, group.PixivMsg)
 
 	core.On(events.EventNameFriendMsg, friend.Hello)
-	core.On(events.EventNameFriendMsg, listener.ListenFriend)
 
 	err = core.ListenAndWait(context.Background())
 	if err != nil {
