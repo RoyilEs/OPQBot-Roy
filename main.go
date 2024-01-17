@@ -22,7 +22,7 @@ func main() {
 		panic(err)
 	}
 
-	go HandleGroupMsg(core)
+	go group.HandleGroupMsg(core)
 
 	core.On(events.EventNameGroupMsg, listener.ListenGroup)
 

@@ -15,11 +15,25 @@ func PixivMsg(ctx context.Context, event events.IEvent) {
 		groupMsg := event.ParseGroupMsg()
 		text := groupMsg.ParseTextMsg().GetTextContent()
 		var ZhouTest = []string{"来点粥图", "来张粥图", "粥图一张"}
+
+		query, err := pixiv.NewPixiv().Set().DoQuery()
+		if err != nil {
+			global.Log.Error(err)
+			return
+		}
+		iPixiv, _ := pixiv.NewPixiv().Do(pixiv.PixivUrl, query)
+
 		if utils.IsInListToS(text, ZhouTest) {
-			iPixiv, _ := pixiv.NewPixivTest()
+			query, err := pixiv.NewPixiv().Set().DoQuery()
+			if err != nil {
+				global.Log.Error(err)
+				return
+			}
+			iPixiv, _ := pixiv.NewPixiv().Do(pixiv.PixivUrl, query)
 			for _, i := range iPixiv.GetData() {
 				url := i.GetDataUrls().GetSize()
 				buf := i.UrlToBase64(url)
+				//TODO 已修改图片质量需要所有修改的钩子函数并作接口化处理
 				pic, err := apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).Upload().
 					GroupPic().SetBase64Buf(buf).DoUpload(ctx)
 				if err != nil {
@@ -35,7 +49,6 @@ func PixivMsg(ctx context.Context, event events.IEvent) {
 
 		var ZhouTest2 = []string{"明日方舟", "来点舟图", "舟图一张"}
 		if utils.IsInListToS(text, ZhouTest2) {
-			iPixiv, _ := pixiv.NewPixivTest()
 			for _, i := range iPixiv.GetData() {
 				url := i.GetDataUrls().GetSize()
 				modifiedUrl := pixiv.ModifyPixivImageUrl(url)

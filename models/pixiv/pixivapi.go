@@ -2,14 +2,13 @@ package pixiv
 
 import (
 	"encoding/base64"
-	"encoding/json"
-	"fmt"
+	jsoniter "github.com/json-iterator/go"
 	"obqbot/global"
 	Ok3Http "obqbot/utils"
 	"strings"
 )
 
-var pixiv = "https://api.lolicon.app/setu/v2?size=regular&tag=%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F&r18=0"
+//var pixiv = "https://api.lolicon.app/setu/v2?size=regular&tag=%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F&r18=0"
 
 type Pixiv struct {
 	size string
@@ -155,15 +154,12 @@ func deleteSlice(s []string, elem string) []string {
 }
 
 func NewPixiv() IPixiv {
-	return &Pixiv{
-		size: "",
-		tag:  "",
-	}
+	return &Pixiv{}
 }
 
-func NewPixivTest() (*PixivResponse, error) {
-	fmt.Println(pixiv)
-	s := Ok3Http.NewHTTPClient(pixiv)
+func (p *Pixiv) Do(url string, pixiv *Pixiv) (*PixivResponse, error) {
+	url = url + "?size=" + pixiv.GetSizeQuery() + "&tag=" + pixiv.GetTagQuery()
+	s := Ok3Http.NewHTTPClient(url)
 	body, err := s.DoGet("", nil)
 	if err != nil {
 		global.Log.Error(err)
@@ -171,7 +167,7 @@ func NewPixivTest() (*PixivResponse, error) {
 	}
 	var pixivResponse PixivResponse
 
-	err = json.Unmarshal(body, &pixivResponse)
+	err = jsoniter.NewDecoder(strings.NewReader(string(body))).Decode(&pixivResponse)
 	if err != nil {
 		global.Log.Error(err)
 		return nil, err
