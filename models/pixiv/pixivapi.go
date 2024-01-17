@@ -3,12 +3,18 @@ package pixiv
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"obqbot/global"
 	Ok3Http "obqbot/utils"
 	"strings"
 )
 
-var pixiv = "https://api.lolicon.app/setu/v2?size=thumb&tag=%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F&r18=0"
+var pixiv = "https://api.lolicon.app/setu/v2?size=regular&tag=%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F&r18=0"
+
+type Pixiv struct {
+	size string
+	tag  string
+}
 
 type PixivResponse struct {
 	Error string `json:"error"`
@@ -32,12 +38,9 @@ type Data struct {
 }
 
 type Urls struct {
-	Thumb string `json:"thumb"`
+	Regular string `json:"regular"`
 }
 
-type IPixiv interface {
-	GetData() []Data
-}
 type IPixivData interface {
 	GetDataPid() int64
 	GetDataP() int64
@@ -53,12 +56,17 @@ type IPixivData interface {
 	GetDataUploadDate() int64
 	GetDataUrls() Urls
 }
-type IDataUrls interface {
-	GetSmall() string
+
+type IData interface {
+	GetData() []Data
 }
 
-func (u Urls) GetThumb() string {
-	return u.Thumb
+type IDataUrls interface {
+	GetSize() string
+}
+
+func (u Urls) GetSize() string {
+	return u.Regular
 }
 
 func (p *PixivResponse) GetData() []Data {
@@ -147,24 +155,33 @@ func deleteSlice(s []string, elem string) []string {
 }
 
 func NewPixiv() IPixiv {
+	return &Pixiv{
+		size: "",
+		tag:  "",
+	}
+}
+
+func NewPixivTest() (*PixivResponse, error) {
+	fmt.Println(pixiv)
 	s := Ok3Http.NewHTTPClient(pixiv)
 	body, err := s.DoGet("", nil)
 	if err != nil {
 		global.Log.Error(err)
-		return nil
+		return nil, err
 	}
 	var pixivResponse PixivResponse
 
 	err = json.Unmarshal(body, &pixivResponse)
 	if err != nil {
 		global.Log.Error(err)
-		return nil
+		return nil, err
 	}
-	return &pixivResponse
+	return &pixivResponse, nil
 }
 
-func (p *Data) DoThumbToBase64(thumb string) (base64buf string) {
-	s := Ok3Http.NewHTTPClient(thumb)
+func (p *Data) UrlToBase64(url string) (base64buf string) {
+
+	s := Ok3Http.NewHTTPClient(url)
 	body, err := s.DoGet("", nil)
 	if err != nil {
 		global.Log.Error(err)

@@ -16,11 +16,10 @@ func PixivMsg(ctx context.Context, event events.IEvent) {
 		text := groupMsg.ParseTextMsg().GetTextContent()
 		var ZhouTest = []string{"来点粥图", "来张粥图", "粥图一张"}
 		if utils.IsInListToS(text, ZhouTest) {
-			iPixiv := pixiv.NewPixiv().GetData()
-
-			for _, i := range iPixiv {
-				url := i.GetDataUrls().GetThumb()
-				buf := i.DoThumbToBase64(url)
+			iPixiv, _ := pixiv.NewPixivTest()
+			for _, i := range iPixiv.GetData() {
+				url := i.GetDataUrls().GetSize()
+				buf := i.UrlToBase64(url)
 				pic, err := apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).Upload().
 					GroupPic().SetBase64Buf(buf).DoUpload(ctx)
 				if err != nil {
@@ -31,9 +30,25 @@ func PixivMsg(ctx context.Context, event events.IEvent) {
 				log.Info(url)
 				apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
 					GroupMsg().ToUin(groupMsg.GetGroupUin()).PicMsg(pic).TextMsg("原图链接:" + pixiv.ModifyPixivImageUrl(url)).Do(ctx)
+			}
+		}
 
-				//apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
-				//	GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg("原图链接:" + pixiv.ModifyPixivImageUrl(url)).Do(ctx)
+		var ZhouTest2 = []string{"明日方舟", "来点舟图", "舟图一张"}
+		if utils.IsInListToS(text, ZhouTest2) {
+			iPixiv, _ := pixiv.NewPixivTest()
+			for _, i := range iPixiv.GetData() {
+				url := i.GetDataUrls().GetSize()
+				modifiedUrl := pixiv.ModifyPixivImageUrl(url)
+				pic, err := apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).Upload().
+					GroupPic().SetFileUrlPath(modifiedUrl).DoUpload(ctx)
+				if err != nil {
+					global.Log.Error(err)
+					return
+				}
+				log.Debug(pic)
+				log.Info(url)
+				apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
+					GroupMsg().ToUin(groupMsg.GetGroupUin()).PicMsg(pic).Do(ctx)
 			}
 		}
 	}

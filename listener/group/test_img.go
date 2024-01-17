@@ -2,12 +2,10 @@ package group
 
 import (
 	"context"
-	"encoding/base64"
 	"github.com/charmbracelet/log"
 	"github.com/opq-osc/OPQBot/v2/apiBuilder"
 	"github.com/opq-osc/OPQBot/v2/events"
 	"obqbot/global"
-	Ok3Http "obqbot/utils"
 	"time"
 )
 
@@ -28,12 +26,12 @@ func Img(ctx context.Context, event events.IEvent) {
 			}
 		}
 		if text == "img" {
-			client := Ok3Http.NewHTTPClient("http://8.141.1.249/uploads/file/(5)[IP[MA20W6]S[A]~DG7G.PNG")
-			body, err := client.DoGet("", nil)
-			if err != nil {
-				panic(err)
-			}
-			pic, err := apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).Upload().GroupPic().SetBase64Buf(base64.StdEncoding.EncodeToString(body)).DoUpload(ctx)
+			//client := Ok3Http.NewHTTPClient("https://i.pixiv.re/img-original/img/2020/08/27/03/29/53/83959163_p1.jpg")
+			////body, err := client.DoGet("", nil)
+			//if err != nil {
+			//	panic(err)
+			//}
+			pic, err := apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).Upload().GroupPic().SetFileUrlPath("https://i.pixiv.re/img-original/img/2024/01/12/03/01/42/115092758_p0.jpg").DoUpload(ctx)
 			if err != nil {
 				panic(err)
 			}
