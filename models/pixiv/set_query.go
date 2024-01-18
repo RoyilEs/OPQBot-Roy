@@ -1,5 +1,7 @@
 package pixiv
 
+import "net/url"
+
 var PixivUrl = "https://api.lolicon.app/setu/v2"
 
 type ISetQuery interface {
@@ -32,7 +34,7 @@ func (p *Pixiv) SetSize(size string) ISetQuery {
 }
 
 func (p *Pixiv) SetTag(tag string) ISetQuery {
-	p.tag = tag
+	p.tag = url.QueryEscape(tag)
 	return p
 }
 

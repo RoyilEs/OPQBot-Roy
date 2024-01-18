@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-//var pixiv = "https://api.lolicon.app/setu/v2?size=regular&tag=%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F&r18=0"
-
 type Pixiv struct {
 	size string
 	tag  string
@@ -116,30 +114,39 @@ func (p *Data) GetDataUrls() Urls {
 func ModifyPixivImageUrl(originalUrl string) (modifiedUrl string) {
 	// 分离出基础URL和尺寸部分
 	parts := strings.Split(originalUrl, "/")
-	// 查找包含"_square"的部分
+	// 查找包含"_master"的部分
 	squareIndex := -1
 	for i, part := range parts {
-		if strings.Contains(part, "_square") {
+		if strings.Contains(part, "_master") {
 			squareIndex = i
 			break
 		}
 	}
 
-	// 如果找到了"_square"，则替换为"_master"
+	// 如果找到了"_master"，则替换为"_square"
 	if squareIndex >= 0 {
-		modifiedPart := strings.Replace(parts[squareIndex], "_square", "_master", 1)
+		modifiedPart := strings.Replace(parts[squareIndex], "_master", "_square", 1)
 		parts[squareIndex] = modifiedPart
 		modifiedUrl = strings.Join(parts, "/")
 	} else {
-		// 如果没有找到"_square"，则返回原URL
+		// 如果没有找到"_master"，则返回原URL
 		modifiedUrl = originalUrl
 	}
 
 	split := strings.Split(modifiedUrl, "/")
-	slice := deleteSlice(split, "c")
-	modifiedUrl = strings.Join(deleteSlice(slice, "250x250_80_a2"), "/")
+	split = insertSlice(split, 3, "c")
+	split = insertSlice(split, 4, "250x250_80_a2")
+	//slice := deleteSlice(split, "c")
+	//modifiedUrl = strings.Join(deleteSlice(slice, "250x250_80_a2"), "/")
 
-	return modifiedUrl
+	return strings.Join(split, "/")
+}
+
+func insertSlice(s []string, index int, elem string) []string {
+	s = append(s, elem)
+	copy(s[index+1:], s[index:])
+	s[index] = elem
+	return s
 }
 
 // deleteSlice 删除指定元素。
