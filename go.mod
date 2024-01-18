@@ -4,7 +4,6 @@ go 1.20
 
 require (
 	github.com/charmbracelet/log v0.3.1
-	github.com/jasonlvhit/gocron v0.0.1
 	github.com/opq-osc/OPQBot/v2 v2.0.0-20231025075339-a352dad09f56
 	github.com/sirupsen/logrus v1.9.3
 	gopkg.in/yaml.v3 v3.0.1
@@ -53,6 +52,7 @@ require (
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/term v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.17.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	rsc.io/qr v0.2.0 // indirect

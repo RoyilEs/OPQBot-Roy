@@ -33,7 +33,8 @@ func main() {
 	core.On(events.EventNameGroupMsg, group.GoodNight)
 	core.On(events.EventNameGroupMsg, group.Img)
 	core.On(events.EventNameGroupMsg, group.Draw)
-	core.On(events.EventNameGroupMsg, group.PixivMsg)
+	core.On(events.EventNameGroupMsg, group.ArknightsImg)
+	core.On(events.EventNameGroupMsg, group.PixivImg)
 
 	core.On(events.EventNameFriendMsg, friend.Hello)
 
