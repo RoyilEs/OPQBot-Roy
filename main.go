@@ -45,6 +45,9 @@ func main() {
 	core.On(events.EventNameGroupMsg, group.ArknightsImg)
 	core.On(events.EventNameGroupMsg, group.PixivImg)
 
+	core.On(events.EventNameGroupMsg, group.UserSign)
+	core.On(events.EventNameGroupMsg, group.UserSignPoint)
+
 	core.On(events.EventNameFriendMsg, friend.Hello)
 
 	err = core.ListenAndWait(context.Background())
