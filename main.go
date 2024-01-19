@@ -5,6 +5,7 @@ import (
 	"github.com/opq-osc/OPQBot/v2"
 	"github.com/opq-osc/OPQBot/v2/events"
 	core2 "obqbot/core"
+	"obqbot/flag"
 	"obqbot/global"
 	"obqbot/listener"
 	"obqbot/listener/friend"
@@ -16,6 +17,15 @@ func main() {
 	core2.InitConf()
 	// 初始化日志
 	global.Log = core2.InitLogger()
+	// 初始化数据库
+	global.DB = core2.InitGorm()
+
+	//命令行参数绑定
+	option := flag.Parse()
+	if flag.IsWebStop(option) {
+		flag.SwitchOption(option)
+		return
+	}
 
 	core, err := OPQBot.NewCore(global.OBQBotUrl)
 	if err != nil {
@@ -23,7 +33,6 @@ func main() {
 	}
 
 	go group.HandleGroupMsg(core)
-
 	core.On(events.EventNameGroupMsg, listener.ListenGroup)
 
 	core.On(events.EventNameFriendMsg, listener.ListenFriend)
