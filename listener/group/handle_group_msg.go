@@ -15,6 +15,24 @@ import (
 var apiUrl = global.OBQBotUrl
 
 func HandleGroupMsg(core *OPQBot.Core) {
+	// help
+	core.On(events.EventNameGroupMsg, func(ctx context.Context, event events.IEvent) {
+		if event.GetMsgType() == events.MsgTypeGroupMsg {
+			groupMsg := event.ParseGroupMsg()
+			if groupMsg.ParseTextMsg().GetTextContent() == "/help" {
+				apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
+					GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg(`
+	/help 帮助
+	来点粥图 来点舟图(两种模式 速度与画质不同)
+	晚安	
+	一言
+	cnm "tag" 根据tag指定涩图(暂只支持单tag)
+
+——作者比较废物就写了这么点
+										`).Do(ctx)
+			}
+		}
+	})
 	// 欢迎公告
 	core.On(events.EventNameGroupJoin, func(ctx context.Context, event events.IEvent) {
 		groupMsg := event.PraseGroupJoinEvent()

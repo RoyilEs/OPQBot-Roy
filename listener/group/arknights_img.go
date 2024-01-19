@@ -5,13 +5,10 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/opq-osc/OPQBot/v2/apiBuilder"
 	"github.com/opq-osc/OPQBot/v2/events"
-	"golang.org/x/time/rate"
-	"obqbot/common/limiter"
 	"obqbot/global"
 	"obqbot/models/pixiv"
 	"obqbot/utils"
 	"strings"
-	"time"
 )
 
 func ArknightsImg(ctx context.Context, event events.IEvent) {
@@ -72,16 +69,16 @@ func ArknightsImg(ctx context.Context, event events.IEvent) {
 
 func PixivImg(ctx context.Context, event events.IEvent) {
 	if event.GetMsgType() == events.MsgTypeGroupMsg {
-		limit := limiter.NewLimiter(rate.Every(1*time.Second), 2, "")
+		//limit := limiter.NewLimiter(rate.Every(1*time.Second), 2, "")
 		groupMsg := event.ParseGroupMsg()
 		text := groupMsg.ParseTextMsg().GetTextContent()
 		split := strings.Split(text, " ")
-		// 令牌桶限流器--防止大量请求
-		if !limit.Allow() {
-			apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
-				GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg("请求过于频繁").Do(ctx)
-			return
-		}
+		//// 令牌桶限流器--防止大量请求
+		//if !limit.Allow() {
+		//	apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
+		//		GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg("请求过于频繁").Do(ctx)
+		//	return
+		//}
 		if split[0] == "cnm" {
 			query, err := pixiv.NewPixiv().Set().SetTag(split[1]).DoQuery()
 			if err != nil {

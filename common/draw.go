@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"github.com/opq-osc/OPQBot/v2/apiBuilder"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
 	"golang.org/x/image/font/opentype"
@@ -13,8 +14,11 @@ import (
 	"image/draw"
 	"image/jpeg"
 	"io/ioutil"
+	"net/http"
 	"obqbot/global"
+	"obqbot/models/pixiv"
 	"os"
+	"strconv"
 )
 
 func loadImage(filePath string) (image.Image, error) {
@@ -57,18 +61,14 @@ func loadFontFace(fontPath string, fontSize float64) (font.Face, error) {
 	return face, nil
 }
 
-func drawTextOnImage(img image.Image, text string, fontPath string, fontSize float64, color color.Color, x, y int) (image.Image, error) {
-	// 加载字体
+func drawTextOnImage(img image.Image, text string, fontPath string, fontSize float64, color color.Color) (image.Image, error) {
 	face, err := loadFontFace(fontPath, fontSize)
 	if err != nil {
 		return nil, err
 	}
 
-	// 创建一个新的图像以便于绘制
 	bounds := img.Bounds()
 	newImg := image.NewRGBA(bounds)
-
-	// 将原始图片复制到新图像上
 	draw.Draw(newImg, bounds, img, bounds.Min, draw.Src)
 
 	d := &font.Drawer{
@@ -77,17 +77,41 @@ func drawTextOnImage(img image.Image, text string, fontPath string, fontSize flo
 		Face: face,
 	}
 
-	// 设置绘制点的位置
+	// 计算文本绘制位置 - 右下角
+	textD := d.MeasureString(text).Round()
+	x := bounds.Dx() - textD
+	y := bounds.Dy() - 10
+
 	pt := fixed.Point26_6{
 		X: fixed.Int26_6(x * 64),
 		Y: fixed.Int26_6(y * 64),
 	}
 
-	// 在指定位置绘制文本
 	d.Dot = pt
 	d.DrawString(text)
 
 	return newImg, nil
+}
+
+func downloadImage(url string) (image.Image, int, int, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+	defer resp.Body.Close()
+
+	imgData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+	height, width := apiBuilder.GetPicHW(imgData)
+
+	img, _, err := image.Decode(bytes.NewReader(imgData))
+	if err != nil {
+		return nil, 0, 0, err
+	}
+
+	return img, height, width, nil
 }
 
 // drawAndEncodeToBase64 空白画图demo
@@ -124,24 +148,35 @@ func main() {
 	//	panic(err)
 	//}
 	//fmt.Printf("Base64 encoded image: %s\n", base64Str)
+	query, _ := pixiv.NewPixiv().Set().DoQuery()
+	pixivResponse, _ := pixiv.NewPixiv().Do(pixiv.PixivUrl, query)
+	data := pixivResponse.GetData()[0]
+	size := data.GetDataUrls().GetSize()
+	fmt.Println(size)
+	i, _, _, err := downloadImage(size)
 	imageFilePath := "uploads/test.jpg"
 	fontFilePath := "uploads/Font.ttf"
-	text := "艹  飞  你!"
-	color1 := color.Black
-	x := 400
-	y := 1000
+	text := "Pixiv|" + strconv.FormatInt(data.GetDataUid(), 10) + "|" + data.GetDataAuthor()
+	color1 := color.RGBA{
+		R: 255,
+		G: 0,
+		B: 100,
+		A: 240,
+	}
+	//x := 400
+	//y := 1000
 	// 加载图片
-	img, err := loadImage(imageFilePath)
+	_, err = loadImage(imageFilePath)
 	if err != nil {
 		panic(err)
 	}
-	newImg, err := drawTextOnImage(img, text, fontFilePath, 80, color1, x, y)
+	newImg, err := drawTextOnImage(i, text, fontFilePath, 50, color1)
 	if err != nil {
 		global.Log.Error(err)
 		return
 	}
 	// 现在newImg包含了带有文本的新图片，你可以选择保存它
-	outFile, err := os.Create("output2.jpg")
+	outFile, err := os.Create("output3.jpg")
 	if err != nil {
 		panic(err)
 	}
