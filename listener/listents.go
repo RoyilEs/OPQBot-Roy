@@ -5,13 +5,14 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/opq-osc/OPQBot/v2/events"
 	"obqbot/global"
+	"obqbot/utils"
 	"strconv"
 )
 
 func ListenGroup(_ context.Context, event events.IEvent) {
 	groupMsg := event.ParseGroupMsg() // 群消息
 	s := "群:" + groupMsg.GetGroupInfo().GroupName
-	if groupMsg.GetGroupUin() != 775064373 {
+	if !utils.IsInGroupS(groupMsg.GetGroupUin(), global.NotListentsGroupUids) {
 		groupMsgNickUin := "成员:" + groupMsg.GetSenderNick() + "(" + strconv.FormatInt(groupMsg.GetSenderUin(), 10) + ")"
 		if !groupMsg.IsFromBot() {
 			global.Log.Info(s + "[" + strconv.FormatInt(groupMsg.GetGroupUin(), 10) + "]")

@@ -2,7 +2,7 @@ package ctype
 
 import "encoding/json"
 
-type SignType int
+type SignType int64
 
 const (
 	SignOk SignType = 1 //已签到

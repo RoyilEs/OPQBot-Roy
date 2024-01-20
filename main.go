@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/opq-osc/OPQBot/v2"
 	"github.com/opq-osc/OPQBot/v2/events"
+	"github.com/robfig/cron"
 	core2 "obqbot/core"
 	"obqbot/flag"
 	"obqbot/global"
@@ -26,7 +27,13 @@ func main() {
 		flag.SwitchOption(option)
 		return
 	}
+	c := cron.New()
 
+	err := c.AddFunc("0 0 0 * * *", group.ResetSignSignNo)
+	if err != nil {
+		panic(err)
+	}
+	c.Start()
 	core, err := OPQBot.NewCore(global.OBQBotUrl)
 	if err != nil {
 		panic(err)

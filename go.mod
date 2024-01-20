@@ -49,6 +49,7 @@ require (
 	github.com/quic-go/quic-go v0.40.1 // indirect
 	github.com/refraction-networking/utls v1.6.1 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/robfig/cron v1.2.0 // indirect
 	github.com/rotisserie/eris v0.5.4 // indirect
 	go.uber.org/mock v0.4.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
