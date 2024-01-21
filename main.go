@@ -51,6 +51,7 @@ func main() {
 	core.On(events.EventNameGroupMsg, group.Draw)
 	core.On(events.EventNameGroupMsg, group.ArknightsImg)
 	core.On(events.EventNameGroupMsg, group.PixivImg)
+	core.On(events.EventNameGroupMsg, group.RandMusicMyGo)
 
 	core.On(events.EventNameGroupMsg, group.UserSign)
 	core.On(events.EventNameGroupMsg, group.UserSignPoint)

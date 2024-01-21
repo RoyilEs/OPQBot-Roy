@@ -27,6 +27,8 @@ func HandleGroupMsg(core *OPQBot.Core) {
 	晚安	
 	一言
 	cnm "tag" 根据tag指定涩图(暂只支持单tag)
+	签到(实验性功能没啥用)
+	MyGo (MyGo随机歌曲)
 
 ——作者比较废物就写了这么点
 										`).Do(ctx)

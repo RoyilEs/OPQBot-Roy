@@ -9,9 +9,14 @@ import (
 	"image"
 	"image/color"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"regexp"
 )
+
+func Random(min, max int) int {
+	return rand.Intn(max-min) + min
+}
 
 func IsInGroupS(str int64, groupUids []int64) bool {
 	for _, s := range groupUids {
