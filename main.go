@@ -40,8 +40,8 @@ func main() {
 	}
 
 	go group.HandleGroupMsg(core)
+	// 日志监听
 	core.On(events.EventNameGroupMsg, listener.ListenGroup)
-
 	core.On(events.EventNameFriendMsg, listener.ListenFriend)
 
 	core.On(events.EventNameGroupMsg, group.Hello)
@@ -52,6 +52,13 @@ func main() {
 	core.On(events.EventNameGroupMsg, group.ArknightsImg)
 	core.On(events.EventNameGroupMsg, group.PixivImg)
 	core.On(events.EventNameGroupMsg, group.RandMusicMyGo)
+
+	//Meme
+	core.On(events.EventNameGroupMsg, group.NewTag)
+	core.On(events.EventNameGroupMsg, group.SetNameTag)
+	core.On(events.EventNameGroupMsg, group.DeleteNameTag)
+	core.On(events.EventNameGroupMsg, group.RandomTag)
+	core.On(events.EventNameGroupMsg, group.AllMemeTag)
 
 	core.On(events.EventNameGroupMsg, group.UserSign)
 	core.On(events.EventNameGroupMsg, group.UserSignPoint)
