@@ -15,12 +15,13 @@ import (
 )
 
 func InitMeme() {
+	toString, _ := models.ArrayToString([]string{
+		"我操死你的吗rtwyzz",
+		"怂逼,不敢对嘴",
+	})
 	friendTag := models.FriendTag{
-		Name: "rtwyzz",
-		TagsData: models.StringArray{
-			"我操死你的吗rtwyzz",
-			"怂逼,不敢对嘴",
-		},
+		Name:     "rtwyzz",
+		TagsData: toString,
 	}
 	global.DB.Create(&friendTag)
 
@@ -65,7 +66,10 @@ func SetNameTag(ctx context.Context, event events.IEvent) {
 				// 新增
 				var friendTag models.FriendTag
 				global.DB.Where("name = ?", texts[1]).First(&friendTag)
-				friendTag.TagsData = append(friendTag.TagsData, texts[2])
+				toArray, _ := models.StringToArray(friendTag.TagsData)
+				toArray = append(toArray, texts[2])
+				toString, _ := models.ArrayToString(toArray)
+				friendTag.TagsData = toString
 				global.DB.Save(&friendTag)
 
 				apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
@@ -93,7 +97,8 @@ func DeleteNameTag(ctx context.Context, event events.IEvent) {
 					return
 				} else {
 					temp := false
-					for _, v := range friendTag.TagsData {
+					toArray, _ := models.StringToArray(friendTag.TagsData)
+					for _, v := range toArray {
 						if v == texts[2] {
 							temp = true
 							break
@@ -105,12 +110,15 @@ func DeleteNameTag(ctx context.Context, event events.IEvent) {
 						return
 					}
 				}
-				for i, v := range friendTag.TagsData {
+				toArray, _ := models.StringToArray(friendTag.TagsData)
+				for i, v := range toArray {
 					if v == texts[2] {
-						friendTag.TagsData = append(friendTag.TagsData[:i], friendTag.TagsData[i+1:]...)
+						toArray = append(toArray[:i], toArray[i+1:]...)
 						break
 					}
 				}
+				toString, _ := models.ArrayToString(toArray)
+				friendTag.TagsData = toString
 				global.DB.Save(&friendTag)
 				apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
 					GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg("删除成功").Do(ctx)
@@ -131,9 +139,10 @@ func RandomTag(ctx context.Context, event events.IEvent) {
 				friendTag models.FriendTag
 			)
 			global.DB.Where("name = ?", result).First(&friendTag)
+			toArray, _ := models.StringToArray(friendTag.TagsData)
 			rand.Seed(time.Now().UnixNano())
-			randomIndex := rand.Intn(len(friendTag.TagsData))
-			tag := friendTag.TagsData[randomIndex]
+			randomIndex := rand.Intn(len(toArray))
+			tag := toArray[randomIndex]
 			apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
 				GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg(tag).Do(ctx)
 		}
@@ -151,7 +160,7 @@ func AllMemeTag(ctx context.Context, event events.IEvent) {
 			)
 			global.DB.Where("name = ?", texts[1]).First(&friendTag)
 			apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
-				GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg(strings.Join(friendTag.TagsData, "\n")).Do(ctx)
+				GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg(strings.Replace(friendTag.TagsData, ",", "\n", -1)).Do(ctx)
 		}
 	}
 }
