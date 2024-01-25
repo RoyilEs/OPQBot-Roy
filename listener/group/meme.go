@@ -130,21 +130,34 @@ func DeleteNameTag(ctx context.Context, event events.IEvent) {
 func RandomTag(ctx context.Context, event events.IEvent) {
 	if event.GetMsgType() == events.MsgTypeGroupMsg {
 		groupMsg := event.ParseGroupMsg()
-		text := groupMsg.ParseTextMsg().GetTextContent()
-		pattern := regexp.MustCompile(`来点(.*)`)
-		matches := pattern.FindStringSubmatch(text)
-		if len(matches) > 1 {
-			result := matches[1]
+		var text = groupMsg.ParseTextMsg().GetTextContent()
+		extractSuffix := func(input, pattern string) (string, error) {
+			re := regexp.MustCompile(pattern)
+			match := re.FindStringSubmatch(input)
+
+			if len(match) <= 1 { // 如果没有匹配到或者只匹配到了整个输入字符串，则返回错误
+				return "", fmt.Errorf("无法从 '%s' 中提取到符合 '%s' 的部分", input, pattern)
+			}
+
+			return match[1], nil // 匹配结果的索引从1开始（0是整个匹配串）
+		}
+		suffix, err := extractSuffix(text, "^来点(.*)$")
+		if err == nil {
 			var (
 				friendTag models.FriendTag
 			)
-			global.DB.Where("name = ?", result).First(&friendTag)
-			toArray, _ := models.StringToArray(friendTag.TagsData)
-			rand.Seed(time.Now().UnixNano())
-			randomIndex := rand.Intn(len(toArray))
-			tag := toArray[randomIndex]
-			apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
-				GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg(tag).Do(ctx)
+			err := global.DB.Where("name = ?", suffix).First(&friendTag).Error
+			if err == nil {
+				toArray, _ := models.StringToArray(friendTag.TagsData)
+				rand.Seed(time.Now().UnixNano())
+				randomIndex := rand.Intn(len(toArray))
+				tag := toArray[randomIndex]
+				apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
+					GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg(tag).Do(ctx)
+			} else {
+				apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
+					GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg("此Meme不存在").Do(ctx)
+			}
 		}
 	}
 }
