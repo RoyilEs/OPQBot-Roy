@@ -154,9 +154,6 @@ func RandomTag(ctx context.Context, event events.IEvent) {
 				tag := toArray[randomIndex]
 				apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
 					GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg(tag).Do(ctx)
-			} else {
-				apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
-					GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg("此Meme不存在").Do(ctx)
 			}
 		}
 	}
