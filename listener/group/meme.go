@@ -91,11 +91,7 @@ func DeleteNameTag(ctx context.Context, event events.IEvent) {
 					friendTag models.FriendTag
 				)
 				err := global.DB.Where("name = ?", texts[1]).First(&friendTag).Error
-				if err != nil {
-					apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
-						GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg("此Meme不存在").Do(ctx)
-					return
-				} else {
+				if err == nil {
 					temp := false
 					toArray, _ := models.StringToArray(friendTag.TagsData)
 					for _, v := range toArray {
