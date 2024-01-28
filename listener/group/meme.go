@@ -138,19 +138,20 @@ func RandomTag(ctx context.Context, event events.IEvent) {
 			return match[1], nil // 匹配结果的索引从1开始（0是整个匹配串）
 		}
 		suffix, err := extractSuffix(text, "^来点(.*)$")
+		if err != nil {
+			return
+		}
+		var (
+			friendTag models.FriendTag
+		)
+		err = global.DB.Where("name = ?", suffix).First(&friendTag).Error
 		if err == nil {
-			var (
-				friendTag models.FriendTag
-			)
-			err := global.DB.Where("name = ?", suffix).First(&friendTag).Error
-			if err == nil {
-				toArray, _ := models.StringToArray(friendTag.TagsData)
-				rand.Seed(time.Now().UnixNano())
-				randomIndex := rand.Intn(len(toArray))
-				tag := toArray[randomIndex]
-				apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
-					GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg(tag).Do(ctx)
-			}
+			toArray, _ := models.StringToArray(friendTag.TagsData)
+			rand.Seed(time.Now().UnixNano())
+			randomIndex := rand.Intn(len(toArray))
+			tag := toArray[randomIndex]
+			apiBuilder.New(global.OBQBotUrl, event.GetCurrentQQ()).SendMsg().
+				GroupMsg().ToUin(groupMsg.GetGroupUin()).TextMsg(tag).Do(ctx)
 		}
 	}
 }
